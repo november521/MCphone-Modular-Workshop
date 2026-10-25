@@ -1,0 +1,29 @@
+# Gradle and build outputs
+.gradle/
+**/build/
+out/
+
+# IDE and local settings
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+local.properties
+
+# Development game data and logs
+run/
+runs/
+logs/
+crash-reports/
+*.log
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
