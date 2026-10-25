@@ -15,3 +15,7 @@ MCphone 的附属模组，将原版工作方块的功能做成可安装到 MCpho
 ## 主模组
 
 [MCphone](https://github.com/november521/mcphone)
+
+## 许可证
+
+本项目采用 [MIT 许可证](LICENSE)。
