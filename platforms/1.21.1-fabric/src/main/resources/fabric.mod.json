@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "Vanilla workstations as installable MCphone modules. Architecture scaffold; gameplay is not implemented yet.",
+  "authors": ["${mod_authors}"],
+  "license": "${mod_license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.november.mcphone.workshop.platform.WorkshopFabric"]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "=${minecraft_version}",
+    "java": ">=${java_version}",
+    "mcphone": "=${mcphone_version}"
+  },
+  "contact": {
+    "sources": "https://github.com/november521/MCphone-Modular-Workshop",
+    "issues": "https://github.com/november521/MCphone-Modular-Workshop/issues"
+  }
+}

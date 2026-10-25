@@ -1,0 +1,18 @@
+plugins {
+    id 'java-library'
+    id 'fabric-loom' version '1.17.20'
+}
+
+apply from: '../../gradle/workshop-common.gradle'
+
+dependencies {
+    minecraft "com.mojang:minecraft:${workshopTarget.minecraft}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${workshopTarget.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${workshopTarget.fabric_api}"
+    modImplementation mcphoneCoordinate
+}
+tasks.named('jar', Jar).configure { archiveClassifier = "${workshopTargetId}-dev" }
+tasks.named('remapJar').configure {
+    archiveFileName = "${artifact_name}-${mod_version}-${workshopTargetId}.jar"
+}

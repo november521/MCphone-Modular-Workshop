@@ -1,0 +1,60 @@
+{
+  "repository": "november521/mcphone",
+  "ref": "v1.11.2",
+  "commit": "67640ead07bb0bb33c3dee2a1ed7b3a02b34e97d",
+  "version": "1.11.2",
+  "targets": {
+    "1.20.1-forge": {
+      "minecraft": "1.20.1",
+      "loader": "Forge",
+      "loader_version": "47.4.23",
+      "java": 17,
+      "gradle": "8.8",
+      "mappings": "official",
+      "asset": {
+        "name": "mcphone-1.11.2-1.20.1-forge.jar",
+        "sha256": "ee502c50880b82ba86e78cd740f48068f1eae54ddbc92e49e7cffe37a6f725f6",
+        "url": "https://github.com/november521/mcphone/releases/download/v1.11.2/mcphone-1.11.2-1.20.1-forge.jar"
+      }
+    },
+    "1.21.1-neoforge": {
+      "minecraft": "1.21.1",
+      "loader": "NeoForge",
+      "loader_version": "21.1.248",
+      "java": 21,
+      "gradle": "9.2.1",
+      "mappings": "official",
+      "asset": {
+        "name": "mcphone-1.11.2-1.21.1-neoforge.jar",
+        "sha256": "95a19d91fba76ca4dddc532ec3425cd84b0881e222671952e91befcdf2631c7c",
+        "url": "https://github.com/november521/mcphone/releases/download/v1.11.2/mcphone-1.11.2-1.21.1-neoforge.jar"
+      }
+    },
+    "1.21.1-fabric": {
+      "minecraft": "1.21.1",
+      "loader": "Fabric",
+      "loader_version": "0.19.5",
+      "java": 21,
+      "gradle": "9.7.1",
+      "mappings": "official",
+      "asset": {
+        "name": "mcphone-1.11.2-1.21.1-fabric.jar",
+        "sha256": "9beaf380fb45fabeb0cb1126f691546af69c7593c5d8bd44bcc42077f08985d2",
+        "url": "https://github.com/november521/mcphone/releases/download/v1.11.2/mcphone-1.11.2-1.21.1-fabric.jar"
+      }
+    },
+    "26.1.2-neoforge": {
+      "minecraft": "26.1.2",
+      "loader": "NeoForge",
+      "loader_version": "26.1.2.100",
+      "java": 25,
+      "gradle": "9.2.1",
+      "mappings": "official",
+      "asset": {
+        "name": "mcphone-1.11.2-26.1.2-neoforge.jar",
+        "sha256": "6b549b1d298129d0b0415e8d016e9c94ef8b85482685d0008ee8f8d90e147ada",
+        "url": "https://github.com/november521/mcphone/releases/download/v1.11.2/mcphone-1.11.2-26.1.2-neoforge.jar"
+      }
+    }
+  }
+}

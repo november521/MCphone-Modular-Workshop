@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+}
+
+apply from: '../../gradle/workshop-common.gradle'
+
+minecraft {
+    mappings channel: 'official', version: workshopTarget.minecraft
+    copyIdeResources = true
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            mods {
+                "${mod_id}" { source sourceSets.main }
+            }
+        }
+        client {}
+        server { args '--nogui' }
+    }
+}
+dependencies {
+    minecraft "net.minecraftforge:forge:${workshopTarget.minecraft}-${workshopTarget.loader_version}"
+    implementation fg.deobf(mcphoneCoordinate)
+}
+tasks.named('jar', Jar).configure { finalizedBy 'reobfJar' }
