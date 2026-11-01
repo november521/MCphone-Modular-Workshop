@@ -56,6 +56,10 @@ class ArchitectureTests(unittest.TestCase):
             jar.writestr('com/november/mcphone/workshop/platform/WorkshopFabric.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('LICENSE', 'MIT License')
+            jar.writestr('META-INF/services/com.november.mcphone.api.client.app.IPhoneApp',
+                         'com.november.mcphone.workshop.client.CraftingApp\n')
+            jar.writestr('com/november/mcphone/workshop/client/CraftingApp.class',
+                         b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('fabric.mod.json', json.dumps(metadata))
             if embed:
                 jar.writestr('com/november/mcphone/api/MCphoneApi.class', b'')
@@ -129,6 +133,28 @@ class ArchitectureTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     build.main()
                 publish.assert_not_called()
+
+    def test_client_reference_in_server_code_is_rejected(self):
+        with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
+            path = Path(temporary) / 'unsafe.jar'
+            self.make_jar(path)
+            with zipfile.ZipFile(path, 'a') as jar:
+                jar.writestr('com/november/mcphone/workshop/Unsafe.class',
+                             b'\xca\xfe\xba\xbe\x00\x00\x00\x41net/minecraft/client/Minecraft')
+            with self.assertRaisesRegex(ValueError, 'client-only'):
+                self.verify(path)
+
+    def test_missing_app_provider_is_rejected(self):
+        with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
+            path = Path(temporary) / 'no-app.jar'
+            self.make_jar(path)
+            other = Path(temporary) / 'incomplete.jar'
+            with zipfile.ZipFile(path) as source, zipfile.ZipFile(other, 'w') as dest:
+                for name in source.namelist():
+                    if not name.endswith('/CraftingApp.class'):
+                        dest.writestr(name, source.read(name))
+            with self.assertRaisesRegex(ValueError, 'provider class'):
+                self.verify(other)
 
 
 if __name__ == '__main__':

@@ -189,6 +189,14 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
                 content = jar.read(file)
                 if int.from_bytes(content[6:8], 'big') > target['java'] + 44:
                     raise ValueError(f'{path}: class requires a newer Java than declared.')
+                if '/client/' not in file and b'net/minecraft/client/' in content:
+                    raise ValueError(f'{path}: common class references client-only Minecraft types: {file}')
+        spi = 'META-INF/services/com.november.mcphone.api.client.app.IPhoneApp'
+        provider = 'com.november.mcphone.workshop.client.CraftingApp'
+        if spi not in files or jar.read(spi).decode('utf-8').strip() != provider:
+            raise ValueError(f'{path}: missing crafting App SPI registration.')
+        if provider.replace('.', '/') + '.class' not in files:
+            raise ValueError(f'{path}: crafting App provider class is missing.')
         metadata_files = {'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml'}
         expected = {'Forge': 'META-INF/mods.toml', 'NeoForge': 'META-INF/neoforge.mods.toml',
                     'Fabric': 'fabric.mod.json'}[target['loader']]

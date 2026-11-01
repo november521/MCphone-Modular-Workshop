@@ -8,5 +8,6 @@ public final class WorkshopFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         ModularWorkshop.initialize();
+        WorkshopNetwork.register();
     }
 }

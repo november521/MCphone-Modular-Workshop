@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: MIT
+package com.november.mcphone.workshop.client;
+
+public final class CraftingSender {
+    private CraftingSender() {}
+    public static void open() {
+        net.neoforged.neoforge.network.PacketDistributor.sendToServer(com.november.mcphone.workshop.platform.OpenCraftingPayload.INSTANCE);
+    }
+}

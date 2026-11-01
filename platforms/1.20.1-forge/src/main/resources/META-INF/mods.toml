@@ -8,7 +8,7 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-description='''Vanilla workstations as installable MCphone modules. Architecture scaffold; gameplay is not implemented yet.'''
+description='''Installable MCphone workstation modules. Includes a portable vanilla crafting table.'''
 
 [[dependencies.${mod_id}]]
 modId="forge"

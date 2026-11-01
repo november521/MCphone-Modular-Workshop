@@ -3,7 +3,7 @@
   "id": "${mod_id}",
   "version": "${mod_version}",
   "name": "${mod_name}",
-  "description": "Vanilla workstations as installable MCphone modules. Architecture scaffold; gameplay is not implemented yet.",
+  "description": "Installable MCphone workstation modules. Includes a portable vanilla crafting table.",
   "authors": ["${mod_authors}"],
   "license": "${mod_license}",
   "environment": "*",
