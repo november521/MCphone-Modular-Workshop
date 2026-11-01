@@ -8,8 +8,8 @@
 同一分支维护所有平台，同一次改动、同一个附属版本号，一次构建产出与 MCphone 正式版
 对应的全部 JAR。附属自身独立发版，不必与 MCphone 使用相同版本号。
 
-本轮基准是 [MCphone v1.11.2](https://github.com/november521/mcphone/releases/tag/v1.11.2)，
-提交 `67640ead07bb0bb33c3dee2a1ed7b3a02b34e97d`。对齐的是正式发布目标，
+本轮基准是 [MCphone v1.12.0](https://github.com/november521/mcphone/releases/tag/v1.12.0)，
+提交 `a2b9f5008d634d7cba2df4a85ded85095d33fc0a`。对齐的是正式发布目标，
 不是把主模组清单中尚未实现的五个组合也标成支持。
 
 | 目标 | Java | Gradle | 编译加载器 |
@@ -166,7 +166,7 @@ MCphone 新版本发布不会自动改写附属源码；需要在升级变更中
 
 ## 参考
 
-- [MCphone v1.11.2 目录与清单](https://github.com/november521/mcphone/tree/v1.11.2)
+- [MCphone v1.12.0 目录与清单](https://github.com/november521/mcphone/tree/v1.12.0)
 - [MCphone 附属接口](https://github.com/november521/mcphone/wiki/Addon-API)
 - [NeoForge ModDevGradle](https://docs.neoforged.net/toolchain/docs/plugins/mdg/)
 - [Fabric Loom 依赖和映射](https://docs.fabricmc.net/develop/loom/options)
