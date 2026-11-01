@@ -197,6 +197,21 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
             raise ValueError(f'{path}: missing crafting App SPI registration.')
         if provider.replace('.', '/') + '.class' not in files:
             raise ValueError(f'{path}: crafting App provider class is missing.')
+        price_spi = 'META-INF/services/com.november.mcphone.api.cost.IAppPriceProvider'
+        price_provider = 'com.november.mcphone.workshop.platform.WorkshopPrices'
+        if price_spi not in files or jar.read(price_spi).decode('utf-8').strip() != price_provider:
+            raise ValueError(f'{path}: missing crafting price SPI registration.')
+        if price_provider.replace('.', '/') + '.class' not in files:
+            raise ValueError(f'{path}: crafting price provider class is missing.')
+        data_dir = 'advancements' if target['minecraft'] == '1.20.1' else 'advancement'
+        receipt_path = f'data/mcphone_workshop/{data_dir}/crafting_purchase.json'
+        other_dir = 'advancement' if data_dir == 'advancements' else 'advancements'
+        if receipt_path not in files or f'data/mcphone_workshop/{other_dir}/crafting_purchase.json' in files:
+            raise ValueError(f'{path}: purchase receipt uses the wrong version data path.')
+        receipt = json.loads(jar.read(receipt_path))
+        if (receipt.get('criteria') != {'purchased': {'trigger': 'minecraft:impossible'}}
+                or receipt.get('requirements') != [['purchased']] or receipt.get('rewards') or receipt.get('display')):
+            raise ValueError(f'{path}: invalid purchase receipt definition.')
         metadata_files = {'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml'}
         expected = {'Forge': 'META-INF/mods.toml', 'NeoForge': 'META-INF/neoforge.mods.toml',
                     'Fabric': 'fabric.mod.json'}[target['loader']]

@@ -1,4 +1,5 @@
 {
   "app.mcphone_workshop.crafting": "工作台",
-  "app.mcphone_workshop.crafting.description": "随身携带 MCphone 手机或平板，即可打开原版工作台。"
+  "app.mcphone_workshop.crafting.description": "随身携带 MCphone 手机或平板，即可打开原版工作台。",
+  "message.mcphone_workshop.purchase_required": "请先在 MCphone 商店购买工作台，并随身携带手机或平板。"
 }

@@ -1,4 +1,5 @@
 {
   "app.mcphone_workshop.crafting": "Crafting Table",
-  "app.mcphone_workshop.crafting.description": "Open a portable vanilla crafting table. Carry an MCphone or tablet to use."
+  "app.mcphone_workshop.crafting.description": "Open a portable vanilla crafting table. Carry an MCphone or tablet to use.",
+  "message.mcphone_workshop.purchase_required": "Purchase Crafting Table in the MCphone store and carry your phone or tablet."
 }

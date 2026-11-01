@@ -61,6 +61,12 @@ class ArchitectureTests(unittest.TestCase):
             jar.writestr('com/november/mcphone/workshop/client/CraftingApp.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('fabric.mod.json', json.dumps(metadata))
+            jar.writestr('META-INF/services/com.november.mcphone.api.cost.IAppPriceProvider',
+                         'com.november.mcphone.workshop.platform.WorkshopPrices\n')
+            jar.writestr('com/november/mcphone/workshop/platform/WorkshopPrices.class',
+                         b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
+            jar.writestr('data/mcphone_workshop/advancement/crafting_purchase.json', json.dumps({
+                'criteria': {'purchased': {'trigger': 'minecraft:impossible'}}, 'requirements': [['purchased']]}))
             if embed:
                 jar.writestr('com/november/mcphone/api/MCphoneApi.class', b'')
 
@@ -155,6 +161,27 @@ class ArchitectureTests(unittest.TestCase):
                         dest.writestr(name, source.read(name))
             with self.assertRaisesRegex(ValueError, 'provider class'):
                 self.verify(other)
+
+    def test_missing_price_registration_is_rejected(self):
+        self.assert_missing_purchase_entry('META-INF/services/com.november.mcphone.api.cost.IAppPriceProvider', 'price SPI')
+
+    def test_missing_price_provider_is_rejected(self):
+        self.assert_missing_purchase_entry('com/november/mcphone/workshop/platform/WorkshopPrices.class', 'price provider')
+
+    def test_missing_purchase_receipt_is_rejected(self):
+        self.assert_missing_purchase_entry('data/mcphone_workshop/advancement/crafting_purchase.json', 'receipt')
+
+    def assert_missing_purchase_entry(self, omitted, message):
+        with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
+            source = Path(temporary) / 'source.jar'
+            dest = Path(temporary) / 'broken.jar'
+            self.make_jar(source)
+            with zipfile.ZipFile(source) as src, zipfile.ZipFile(dest, 'w') as out:
+                for name in src.namelist():
+                    if name != omitted:
+                        out.writestr(name, src.read(name))
+            with self.assertRaisesRegex(ValueError, message):
+                self.verify(dest)
 
 
 if __name__ == '__main__':

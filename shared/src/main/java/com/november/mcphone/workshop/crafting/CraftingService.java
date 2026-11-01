@@ -9,7 +9,11 @@ public final class CraftingService {
     private CraftingService() {}
     /** Called only on the server thread. No client inventory or recipe data is accepted. */
     public static void open(ServerPlayer player) {
-        if (!CraftingAccess.canUse(player) || player.containerMenu instanceof PortableCraftingMenu) return;
+        if (!CraftingAccess.canUse(player)) {
+            player.sendSystemMessage(Component.translatable("message.mcphone_workshop.purchase_required"));
+            return;
+        }
+        if (player.containerMenu instanceof PortableCraftingMenu) return;
         player.openMenu(new SimpleMenuProvider((id, inventory, owner) -> new PortableCraftingMenu(id, inventory),
                 Component.translatable("container.crafting")));
     }
