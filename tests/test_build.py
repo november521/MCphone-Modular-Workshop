@@ -62,9 +62,10 @@ class ArchitectureTests(unittest.TestCase):
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('LICENSE', 'MIT License')
             jar.writestr('META-INF/services/com.november.mcphone.api.client.app.IPhoneApp',
-                         'com.november.mcphone.workshop.client.CraftingApp\n')
-            jar.writestr('com/november/mcphone/workshop/client/CraftingApp.class',
-                         b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
+                         ''.join(f'com.november.mcphone.workshop.client.{app}\n' for app in build.APPS.values()))
+            for app in build.APPS.values():
+                jar.writestr(f'com/november/mcphone/workshop/client/{app}.class',
+                             b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             if loader == 'Fabric':
                 jar.writestr('fabric.mod.json', json.dumps(metadata))
             else:
@@ -79,8 +80,9 @@ class ArchitectureTests(unittest.TestCase):
             jar.writestr('com/november/mcphone/workshop/platform/WorkshopPrices.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             data_dir = 'advancements' if target == '1.20.1-forge' else 'advancement'
-            jar.writestr(f'data/mcphone_workshop/{data_dir}/crafting_purchase.json', json.dumps({
-                'criteria': {'purchased': {'trigger': 'minecraft:impossible'}}, 'requirements': [['purchased']]}))
+            for station in build.APPS:
+                jar.writestr(f'data/mcphone_workshop/{data_dir}/{station}_purchase.json', json.dumps({
+                    'criteria': {'purchased': {'trigger': 'minecraft:impossible'}}, 'requirements': [['purchased']]}))
             if embed:
                 jar.writestr('com/november/mcphone/api/MCphoneApi.class', b'')
 
@@ -212,6 +214,15 @@ class ArchitectureTests(unittest.TestCase):
 
     def test_missing_purchase_receipt_is_rejected(self):
         self.assert_missing_purchase_entry('data/mcphone_workshop/advancement/crafting_purchase.json', 'receipt')
+
+    def test_each_new_station_requires_its_own_app_and_receipt(self):
+        for station in ('smithing', 'anvil', 'stonecutter'):
+            with self.subTest(station=station, missing='App'):
+                self.assert_missing_purchase_entry(
+                    f'com/november/mcphone/workshop/client/{build.APPS[station]}.class', 'provider class')
+            with self.subTest(station=station, missing='receipt'):
+                self.assert_missing_purchase_entry(
+                    f'data/mcphone_workshop/advancement/{station}_purchase.json', 'receipt')
 
     def assert_missing_purchase_entry(self, omitted, message):
         with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:

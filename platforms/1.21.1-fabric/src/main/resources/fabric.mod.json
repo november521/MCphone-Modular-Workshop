@@ -3,7 +3,7 @@
   "id": "${mod_id}",
   "version": "${mod_version}",
   "name": "${mod_name}",
-  "description": "Installable MCphone workstation modules. Includes a portable vanilla crafting table.",
+  "description": "Installable MCphone workstation modules. Portable crafting table, smithing table, anvil and stonecutter Apps.",
   "authors": ["${mod_authors}"],
   "license": "${mod_license}",
   "environment": "*",

@@ -1,7 +1,7 @@
 # MCphone: Modular Workshop 架构
 
-状态：已建立四目标工程，工作台使用独立原版界面；后续工作站尚未实现。
-2026-10-25：四目标本地构建、12 项构建机制测试和工作流配置校验通过。
+状态：四目标工程已接入工作台、锻造台、铁砧、切石机，均使用独立原版界面。
+构建、打包与菜单隔离检查见自动化任务；完整游戏内验收分列于各功能文档。
 
 ## 1. 目标与基准
 
@@ -37,7 +37,12 @@ versions/
 shared/src/main/
   java/com/november/mcphone/workshop/
     ModularWorkshop.java          两端都能加载的公共初始化
-  resources/                      未来跨版本通用的语言、贴图等
+    workstation/                  工作站标识、购买、权限与服务端菜单分发
+    crafting/                     原有便携工作台容器
+    menu/                         锻造台、铁砧、切石机容器与铁砧世界操作隔离
+    client/                       四个 App 的公共入口
+  resources/                      通用语言、App 与价格 SPI 注册
+shared/src/test/java/             在每个目标实际原版接口上运行的菜单隔离与标识检查
 layers/
   loader/neoforge/src/main/        两个 NeoForge 目标共用的入口和元数据
   version/<API边界>/src/main/      按需加入的版本兼容代码／资源
@@ -87,6 +92,12 @@ Gradle 多项目进程。所有已混淆目标使用 Mojang official mappings；
 打开原版 `MenuType.CRAFTING` 界面。其他手机内页面可按需使用 `IPhonePage`。
 默认不预装，由应用商店安装。优先复用 MCphone
 现有安装／卸载和页面生命周期，避免再造一套客户端 App 管理器。
+
+当前四个 App 的固定标识与价格项集中在 `Workstation`。打开请求仅携带固定整数选择器，
+`WorkstationService` 在服务端核对对应工作站的购买记录与设备，再打开相应原版容器类型。
+每个工作站的购买进度互相独立；保留旧 `crafting_purchase` 标识，使原工作台购买记录继续有效。
+铁砧保留 `super.onTake` 的经验、材料和加载器事件，仅在取出结果期间屏蔽世界回调，
+防止损坏真实世界的铁砧。关闭返还仍使用真实上下文，不能全程传入 `ContainerLevelAccess.NULL`。
 
 客户端 App 和页面仅放在 `client` 包中，公共入口、网络包、模块定义不能引用它们。
 SPI 服务提供者只在 MCphone 的客户端发现流程中加载，专用服务器不加载页面实现。
@@ -166,6 +177,8 @@ MCphone 新版本发布不会自动改写附属源码；需要在升级变更中
 
 - 架构检查和脚本测试证明清单、锁和汇总机制按规则工作。
 - 四目标实际构建证明当前源码能在对应工具链上编译、转换映射和打包。
+- 每个目标的 `testPortableMenus` 使用该目标的真实 `ContainerLevelAccess` 检查铁砧操作隔离、
+  异常后的关闭上下文恢复、工作站标识唯一性和无效选择器拒绝；不需要启动游戏。
 - 客户端／专用服务器启动、安装卸载、制作和加工操作需要另行运行验证。
 
 “编译成功”不等于工作方块功能或多人安全已验收。首个功能实现后，应在四个目标上加入

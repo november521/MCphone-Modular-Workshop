@@ -1,5 +1,11 @@
 {
   "app.mcphone_workshop.crafting": "Crafting Table",
   "app.mcphone_workshop.crafting.description": "Open a portable vanilla crafting table. Carry an MCphone or tablet to use.",
-  "message.mcphone_workshop.purchase_required": "Purchase Crafting Table in the MCphone store and carry your phone or tablet."
+  "message.mcphone_workshop.purchase_required": "Purchase %s in the MCphone store and carry your phone or tablet.",
+  "app.mcphone_workshop.smithing": "Smithing Table",
+  "app.mcphone_workshop.smithing.description": "Unlock a portable vanilla smithing table with one block. Carry an MCphone or tablet to use.",
+  "app.mcphone_workshop.anvil": "Anvil",
+  "app.mcphone_workshop.anvil.description": "Unlock with one undamaged anvil. Uses vanilla XP and materials; the portable anvil never breaks.",
+  "app.mcphone_workshop.stonecutter": "Stonecutter",
+  "app.mcphone_workshop.stonecutter.description": "Unlock a portable vanilla stonecutter with one block. Carry an MCphone or tablet to use."
 }

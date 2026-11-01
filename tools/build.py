@@ -20,6 +20,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMON_CLASS = 'com/november/mcphone/workshop/ModularWorkshop.class'
+APPS = {'crafting': 'CraftingApp', 'smithing': 'SmithingApp', 'anvil': 'AnvilApp', 'stonecutter': 'StonecutterApp'}
 
 
 def read_json(path: Path):
@@ -196,11 +197,12 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
                 if '/client/' not in file and b'net/minecraft/client/' in content:
                     raise ValueError(f'{path}: common class references client-only Minecraft types: {file}')
         spi = 'META-INF/services/com.november.mcphone.api.client.app.IPhoneApp'
-        provider = 'com.november.mcphone.workshop.client.CraftingApp'
-        if spi not in files or jar.read(spi).decode('utf-8').strip() != provider:
-            raise ValueError(f'{path}: missing crafting App SPI registration.')
-        if provider.replace('.', '/') + '.class' not in files:
-            raise ValueError(f'{path}: crafting App provider class is missing.')
+        providers = {f'com.november.mcphone.workshop.client.{app}' for app in APPS.values()}
+        if spi not in files or set(jar.read(spi).decode('utf-8').splitlines()) != providers:
+            raise ValueError(f'{path}: missing workstation App SPI registration.')
+        for provider in providers:
+            if provider.replace('.', '/') + '.class' not in files:
+                raise ValueError(f'{path}: workstation App provider class is missing: {provider}')
         price_spi = 'META-INF/services/com.november.mcphone.api.cost.IAppPriceProvider'
         price_provider = 'com.november.mcphone.workshop.platform.WorkshopPrices'
         if price_spi not in files or jar.read(price_spi).decode('utf-8').strip() != price_provider:
@@ -208,14 +210,15 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
         if price_provider.replace('.', '/') + '.class' not in files:
             raise ValueError(f'{path}: crafting price provider class is missing.')
         data_dir = 'advancements' if target['minecraft'] == '1.20.1' else 'advancement'
-        receipt_path = f'data/mcphone_workshop/{data_dir}/crafting_purchase.json'
         other_dir = 'advancement' if data_dir == 'advancements' else 'advancements'
-        if receipt_path not in files or f'data/mcphone_workshop/{other_dir}/crafting_purchase.json' in files:
-            raise ValueError(f'{path}: purchase receipt uses the wrong version data path.')
-        receipt = json.loads(jar.read(receipt_path))
-        if (receipt.get('criteria') != {'purchased': {'trigger': 'minecraft:impossible'}}
-                or receipt.get('requirements') != [['purchased']] or receipt.get('rewards') or receipt.get('display')):
-            raise ValueError(f'{path}: invalid purchase receipt definition.')
+        for station in APPS:
+            receipt_path = f'data/mcphone_workshop/{data_dir}/{station}_purchase.json'
+            if receipt_path not in files or f'data/mcphone_workshop/{other_dir}/{station}_purchase.json' in files:
+                raise ValueError(f'{path}: purchase receipt uses the wrong version data path: {station}')
+            receipt = json.loads(jar.read(receipt_path))
+            if (receipt.get('criteria') != {'purchased': {'trigger': 'minecraft:impossible'}}
+                    or receipt.get('requirements') != [['purchased']] or receipt.get('rewards') or receipt.get('display')):
+                raise ValueError(f'{path}: invalid purchase receipt definition: {station}')
         metadata_files = {'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml'}
         expected = {'Forge': 'META-INF/mods.toml', 'NeoForge': 'META-INF/neoforge.mods.toml',
                     'Fabric': 'fabric.mod.json'}[target['loader']]

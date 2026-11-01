@@ -26,6 +26,13 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(target.java as int)
 
 sourceSets.main.java.srcDir(new File(repositoryRoot, 'shared/src/main/java'))
 sourceSets.main.resources.srcDir(new File(repositoryRoot, 'shared/src/main/resources'))
+// A standalone verification main, not a JUnit suite. Reuse the main Minecraft classpath lazily:
+// ModDevGradle attaches the game dependency after this shared script is applied.
+def menuTests = sourceSets.create('menuTest') {
+    java.srcDir(new File(repositoryRoot, 'shared/src/test/java'))
+    compileClasspath = files(sourceSets.main.output, providers.provider { sourceSets.main.compileClasspath })
+    runtimeClasspath = files(output, sourceSets.main.output, providers.provider { sourceSets.main.runtimeClasspath })
+}
 def layers = parser.parse(new File(repositoryRoot, 'versions/layers.json'))
 target.layers.each { name ->
     def layer = layers[name]
@@ -72,3 +79,11 @@ tasks.named('jar', Jar).configure {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+tasks.register('testPortableMenus', JavaExec) {
+    description = 'Check the anvil world-effect guard and independent workstation identities.'
+    dependsOn(tasks.named(menuTests.classesTaskName))
+    classpath = menuTests.runtimeClasspath
+    mainClass = 'com.november.mcphone.workshop.menu.PortableMenuTest'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(target.java as int) }
+}
+tasks.named('check').configure { dependsOn(tasks.named('testPortableMenus')) }

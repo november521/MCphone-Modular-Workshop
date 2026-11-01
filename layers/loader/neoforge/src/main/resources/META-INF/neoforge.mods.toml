@@ -8,7 +8,7 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-description='''Installable MCphone workstation modules. Includes a portable vanilla crafting table.'''
+description='''Installable MCphone workstation modules. Portable crafting table, smithing table, anvil and stonecutter Apps.'''
 
 [[dependencies.${mod_id}]]
 modId="neoforge"

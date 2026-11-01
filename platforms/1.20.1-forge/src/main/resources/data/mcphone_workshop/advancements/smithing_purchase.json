@@ -1,0 +1,12 @@
+{
+  "criteria": {
+    "purchased": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "purchased"
+    ]
+  ]
+}

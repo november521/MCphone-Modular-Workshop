@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 package com.november.mcphone.workshop.crafting;
 
+import com.november.mcphone.workshop.workstation.Workstation;
+import com.november.mcphone.workshop.workstation.WorkstationAccess;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
@@ -13,6 +15,6 @@ public final class PortableCraftingMenu extends CraftingMenu {
         super(id, inventory, ContainerLevelAccess.create(inventory.player.level(), inventory.player.blockPosition()));
     }
     @Override public boolean stillValid(Player player) {
-        return CraftingAccess.canUse(player);
+        return WorkstationAccess.canUse(player, Workstation.CRAFTING);
     }
 }

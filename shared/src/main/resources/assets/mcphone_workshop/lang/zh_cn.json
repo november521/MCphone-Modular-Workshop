@@ -1,5 +1,11 @@
 {
   "app.mcphone_workshop.crafting": "工作台",
   "app.mcphone_workshop.crafting.description": "随身携带 MCphone 手机或平板，即可打开原版工作台。",
-  "message.mcphone_workshop.purchase_required": "请先在 MCphone 商店购买工作台，并随身携带手机或平板。"
+  "message.mcphone_workshop.purchase_required": "请先在 MCphone 商店购买“%s”，并随身携带手机或平板。",
+  "app.mcphone_workshop.smithing": "锻造台",
+  "app.mcphone_workshop.smithing.description": "消耗一个锻造台永久解锁，随身携带手机或平板即可打开原版界面。",
+  "app.mcphone_workshop.anvil": "铁砧",
+  "app.mcphone_workshop.anvil.description": "消耗一个完好的铁砧永久解锁；使用消耗原版经验与材料，铁砧不会损坏。",
+  "app.mcphone_workshop.stonecutter": "切石机",
+  "app.mcphone_workshop.stonecutter.description": "消耗一个切石机永久解锁，随身携带手机或平板即可打开原版界面。"
 }
