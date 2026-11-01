@@ -67,6 +67,10 @@ def check() -> tuple[dict, dict, dict]:
         raise ValueError('The project license must remain MIT.')
     if not re.fullmatch(r'[0-9A-Za-z_.+\-]+', identity['mod_version']):
         raise ValueError('Unsafe mod version.')
+    minimum = identity.get('mcphone_min_version', '')
+    if (not re.fullmatch(r'\d+\.\d+\.\d+', minimum)
+            or version_parts(minimum) > version_parts(lock['version'])):
+        raise ValueError('MCphone minimum version must be a release at or below the compile version.')
     used_layers = set()
     for name, target in targets.items():
         if name != f"{target['minecraft']}-{target['loader'].lower()}":
@@ -225,8 +229,8 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
             actual_version = metadata['version']
             actual_id = metadata['id']
             dependency = metadata['depends']['mcphone']
-            if dependency != f"={lock['version']}":
-                raise ValueError(f'{path}: MCphone runtime dependency differs from lock.')
+            if dependency != f">={identity['mcphone_min_version']}":
+                raise ValueError(f'{path}: MCphone runtime dependency differs from compatibility minimum.')
         else:
             actual_version = metadata['mods'][0]['version']
             actual_id = metadata['mods'][0]['modId']
@@ -234,8 +238,8 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
             dependency = next(d for d in dependencies if d['modId'] == 'mcphone')
             required = dependency.get('mandatory') is True if target['loader'] == 'Forge' else (
                 dependency.get('type') == 'required')
-            if not required or dependency['versionRange'] != f"[{lock['version']}]":
-                raise ValueError(f'{path}: MCphone must be a required, locked runtime dependency.')
+            if not required or dependency['versionRange'] != f"[{identity['mcphone_min_version']},)":
+                raise ValueError(f'{path}: MCphone must be required with the declared compatibility minimum.')
         if actual_id != identity['mod_id'] or actual_version != identity['mod_version']:
             raise ValueError(f'{path}: inconsistent mod identity.')
 
@@ -249,7 +253,8 @@ def publish_bundle(staging: Path, selected: list[str], targets: dict, lock: dict
         verify_jar(jar, name, targets[name], lock, identity)
         rows.append({'target': name, 'file': jar.name, 'sha256': digest(jar)})
     report = {'version': identity['mod_version'], 'commit': revision, 'dirty': dirty,
-              'mcphone': {'version': lock['version'], 'commit': lock['commit']},
+              'mcphone': {'version': lock['version'], 'commit': lock['commit'],
+                          'minimum_version': identity['mcphone_min_version']},
               'complete': set(selected) == set(targets), 'artifacts': rows}
     (staging / 'build-report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     (staging / 'SHA256SUMS').write_text(''.join(f"{r['sha256']}  {r['file']}\n" for r in rows), encoding='utf-8')

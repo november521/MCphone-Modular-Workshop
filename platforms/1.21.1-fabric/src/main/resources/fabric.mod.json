@@ -15,7 +15,7 @@
     "fabric-api": "*",
     "minecraft": "=${minecraft_version}",
     "java": ">=${java_version}",
-    "mcphone": "=${mcphone_version}"
+    "mcphone": ">=${mcphone_min_version}"
   },
   "contact": {
     "sources": "https://github.com/november521/MCphone-Modular-Workshop",

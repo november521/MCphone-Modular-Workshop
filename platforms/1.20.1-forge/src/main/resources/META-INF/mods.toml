@@ -27,6 +27,6 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="mcphone"
 mandatory=true
-versionRange="[${mcphone_version}]"
+versionRange="[${mcphone_min_version},)"
 ordering="AFTER"
 side="BOTH"

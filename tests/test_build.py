@@ -45,27 +45,41 @@ class ArchitectureTests(unittest.TestCase):
     def test_non_release_dependency_url_is_rejected(self):
         self.check_changed('upstream.lock.json', lambda lock: lock['targets']['1.20.1-forge']['asset'].update(url='https://example.com/mod.jar'))
 
-    def make_jar(self, path, *, version=None, mcphone=None, major=65, embed=False):
+    def make_jar(self, path, *, version=None, mcphone=None, major=65, embed=False,
+                 target='1.21.1-fabric'):
+        loader = self.targets[target]['loader']
+        dependency = mcphone or (f">={self.identity['mcphone_min_version']}" if loader == 'Fabric'
+                                 else f"[{self.identity['mcphone_min_version']},)")
         metadata = {
             'id': self.identity['mod_id'], 'version': version or self.identity['mod_version'],
-            'depends': {'mcphone': mcphone or f"={self.lock['version']}"}
+            'depends': {'mcphone': dependency}
         }
         with zipfile.ZipFile(path, 'w') as jar:
             jar.writestr('com/november/mcphone/', b'')
             jar.writestr(build.COMMON_CLASS, b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
-            jar.writestr('com/november/mcphone/workshop/platform/WorkshopFabric.class',
+            entrypoint = {'Fabric': 'WorkshopFabric', 'Forge': 'WorkshopForge', 'NeoForge': 'WorkshopNeoForge'}[loader]
+            jar.writestr(f'com/november/mcphone/workshop/platform/{entrypoint}.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('LICENSE', 'MIT License')
             jar.writestr('META-INF/services/com.november.mcphone.api.client.app.IPhoneApp',
                          'com.november.mcphone.workshop.client.CraftingApp\n')
             jar.writestr('com/november/mcphone/workshop/client/CraftingApp.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
-            jar.writestr('fabric.mod.json', json.dumps(metadata))
+            if loader == 'Fabric':
+                jar.writestr('fabric.mod.json', json.dumps(metadata))
+            else:
+                required = 'mandatory=true' if loader == 'Forge' else 'type="required"'
+                name = 'mods.toml' if loader == 'Forge' else 'neoforge.mods.toml'
+                jar.writestr(f'META-INF/{name}',
+                             f'[[mods]]\nmodId="{metadata["id"]}"\nversion="{metadata["version"]}"\n'
+                             f'[[dependencies.{metadata["id"]}]]\nmodId="mcphone"\n'
+                             f'{required}\nversionRange="{dependency}"\n')
             jar.writestr('META-INF/services/com.november.mcphone.api.cost.IAppPriceProvider',
                          'com.november.mcphone.workshop.platform.WorkshopPrices\n')
             jar.writestr('com/november/mcphone/workshop/platform/WorkshopPrices.class',
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
-            jar.writestr('data/mcphone_workshop/advancement/crafting_purchase.json', json.dumps({
+            data_dir = 'advancements' if target == '1.20.1-forge' else 'advancement'
+            jar.writestr(f'data/mcphone_workshop/{data_dir}/crafting_purchase.json', json.dumps({
                 'criteria': {'purchased': {'trigger': 'minecraft:impossible'}}, 'requirements': [['purchased']]}))
             if embed:
                 jar.writestr('com/november/mcphone/api/MCphoneApi.class', b'')
@@ -92,6 +106,34 @@ class ArchitectureTests(unittest.TestCase):
             self.make_jar(path, mcphone='*')
             with self.assertRaises(ValueError):
                 self.verify(path)
+
+    def test_runtime_minimum_is_enforced_for_every_loader(self):
+        for target, row in self.targets.items():
+            expected = (f">={self.identity['mcphone_min_version']}" if row['loader'] == 'Fabric'
+                        else f"[{self.identity['mcphone_min_version']},)")
+            for dependency in (expected, f"={self.lock['version']}", f"[{self.lock['version']}]",
+                               '*', '>=1.9.0', '[1.9.0,)'):
+                with self.subTest(target=target, dependency=dependency), \
+                     tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
+                    path = Path(temporary) / 'range.jar'
+                    self.make_jar(path, target=target, mcphone=dependency, major=row['java'] + 44)
+                    if dependency == expected:
+                        build.verify_jar(path, target, row, self.lock, self.identity)
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'MCphone'):
+                            build.verify_jar(path, target, row, self.lock, self.identity)
+
+    def test_invalid_or_newer_runtime_minimum_is_rejected(self):
+        original = build.properties
+        for minimum in ('', '*', '1.10', '999.0.0'):
+            def props(path):
+                result = original(path)
+                if path == build.ROOT / 'gradle.properties':
+                    result['mcphone_min_version'] = minimum
+                return result
+            with self.subTest(minimum=minimum), patch.object(build, 'properties', side_effect=props):
+                with self.assertRaisesRegex(ValueError, 'minimum version'):
+                    build.check()
 
     def test_newer_java_bytecode_is_rejected(self):
         with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
