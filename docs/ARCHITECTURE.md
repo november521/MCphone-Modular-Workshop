@@ -65,6 +65,13 @@ dist/                             已校验产物，不提交版本库
 `shared` 不直接依赖加载器 API；附属对 MCphone 的调用只进入 `com.november.mcphone.api`，
 不继承或导入主模组的 `core`、`feature`、`platform` 内部实现。
 
+兼容例外：`compat/LegacyPurchaseReader` 为修复历史已购记录与附属资格不一致的问题，
+通过反射只读调用 MCphone 的 `PhonePlayerData.of(player).purchasedApps().has(id)`。
+目前公开 API 没有服务端已购查询，该桥接仅在缺失资格且对应进度存在时用于恢复，
+不写主模组数据、不依赖客户端安装状态，也不采用免费 App 的权限兜底。
+方法缺失或读取异常时记录一次警告并拒绝恢复，已有资格继续可用。各目标构建校验真实依赖的方法签名。
+主模组提供公开查询后应替换这个隔离的桥接。
+
 四个平台是独立 Gradle 工程，通过共同源码目录复用代码，不把互不兼容的构建插件塞进同一个
 Gradle 多项目进程。所有已混淆目标使用 Mojang official mappings；26.1.2 沿用官方名称。
 共享源码保持 Java 17 语法，各目标仍用自己的 Java 工具链编译。

@@ -5,6 +5,7 @@ import com.november.mcphone.workshop.crafting.PortableCraftingMenu;
 import com.november.mcphone.workshop.menu.PortableAnvilMenu;
 import com.november.mcphone.workshop.menu.PortableSmithingMenu;
 import com.november.mcphone.workshop.menu.PortableStonecutterMenu;
+import com.november.mcphone.workshop.platform.PurchaseAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -17,6 +18,11 @@ public final class WorkstationService {
     public static void open(ServerPlayer player, int networkId) {
         Workstation workstation = Workstation.fromNetworkId(networkId);
         if (workstation == null) return;
+        if (!WorkstationAccess.hasDevice(player)) {
+            player.sendSystemMessage(Component.translatable("message.mcphone_workshop.device_required"));
+            return;
+        }
+        PurchaseAccess.recover(player, workstation);
         if (!WorkstationAccess.canUse(player, workstation)) {
             player.sendSystemMessage(Component.translatable("message.mcphone_workshop.purchase_required",
                     Component.translatable(workstation.titleKey())));

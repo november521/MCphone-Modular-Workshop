@@ -18,6 +18,12 @@ public final class PurchaseAccess {
         var criterion = player.getAdvancements().getOrStartProgress(advancement).getCriterion("purchased");
         return criterion != null && criterion.isDone();
     }
+    public static void recover(ServerPlayer player, Workstation workstation) {
+        com.november.mcphone.workshop.compat.PurchaseRecovery.recover(
+                () -> has(player, workstation), () -> ready(player, workstation),
+                () -> com.november.mcphone.workshop.compat.LegacyPurchaseReader.hasPurchased(player, new ResourceLocation(workstation.appId())),
+                () -> grant(player, workstation));
+    }
     public static void grant(ServerPlayer player, Workstation workstation) {
         var advancement = player.level().getServer().getAdvancements().getAdvancement(new ResourceLocation(workstation.receiptId()));
         if (advancement == null) throw new IllegalStateException("Missing purchase receipt: " + workstation.receiptId());

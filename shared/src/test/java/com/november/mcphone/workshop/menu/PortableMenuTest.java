@@ -62,6 +62,37 @@ public final class PortableMenuTest {
         for (int id : new int[] {-1, 4, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
             check(Workstation.fromNetworkId(id) == null, "Invalid station selectors must be rejected");
         }
-        System.out.println("Portable menu checks passed: scoped anvil world effects and independent station identities.");
+        // Reproduce a paid App with a missing Workshop receipt, without trusting client installation.
+        var paid = new HashSet<String>();
+        var recovered = new HashSet<String>();
+        paid.add(Workstation.CRAFTING.appId());
+        for (Workstation station : Workstation.values()) {
+            com.november.mcphone.workshop.compat.PurchaseRecovery.recover(
+                    () -> recovered.contains(station.appId()), () -> true,
+                    () -> paid.contains(station.appId()), () -> recovered.add(station.appId()));
+        }
+        check(recovered.equals(paid), "Recover only the station recorded as paid on the server");
+        com.november.mcphone.workshop.compat.PurchaseRecovery.recover(
+                () -> true, () -> { throw new AssertionError("Existing receipt must skip migration"); },
+                () -> false, () -> { throw new AssertionError("Must not re-grant existing receipt"); });
+        com.november.mcphone.workshop.compat.PurchaseRecovery.recover(
+                () -> false, () -> false,
+                () -> { throw new AssertionError("Missing advancement must skip host lookup"); },
+                () -> { throw new AssertionError("Cannot grant a missing advancement"); });
+        // Validate bridge method signatures against the actual MCphone dependency on every target.
+        try {
+            Class<?> data = Class.forName("com.november.mcphone.core.PhonePlayerData", false,
+                    PortableMenuTest.class.getClassLoader());
+            var view = data.getMethod("of", net.minecraft.world.entity.player.Player.class);
+            var purchases = view.getReturnType().getMethod("purchasedApps");
+            Class<?> identifier;
+            try { identifier = Class.forName("net.minecraft.resources.ResourceLocation"); }
+            catch (ClassNotFoundException renamed) { identifier = Class.forName("net.minecraft.resources.Identifier"); }
+            check(purchases.getReturnType().getMethod("has", identifier).getReturnType() == boolean.class,
+                    "Host paid lookup must return an explicit boolean");
+        } catch (ReflectiveOperationException error) {
+            throw new AssertionError("Legacy purchase bridge does not match this target", error);
+        }
+        System.out.println("Portable menu checks passed: anvil effects, station identities, paid-only recovery and host lookup signatures.");
     }
 }

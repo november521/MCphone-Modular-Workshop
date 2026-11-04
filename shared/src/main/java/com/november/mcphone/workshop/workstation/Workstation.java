@@ -24,7 +24,8 @@ public enum Workstation {
     public String appId() { return "mcphone_workshop:" + path; }
     public String receiptId() { return appId() + "_purchase"; }
     public String titleKey() { return "app.mcphone_workshop." + path; }
-    public String iconTexture() { return "minecraft:textures/block/" + texture + ".png"; }
+    public String iconTexture() { return this == CRAFTING ? "minecraft:textures/block/" + texture + ".png"
+                : "mcphone_workshop:textures/app/" + path + ".png"; }
     public ItemLike purchaseItem() {
         return switch (this) {
             case CRAFTING -> Items.CRAFTING_TABLE;
