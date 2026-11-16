@@ -20,7 +20,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMON_CLASS = 'com/november/mcphone/workshop/ModularWorkshop.class'
-APPS = {'crafting': 'CraftingApp', 'smithing': 'SmithingApp', 'anvil': 'AnvilApp', 'stonecutter': 'StonecutterApp'}
+APPS = {'crafting': 'CraftingApp', 'smithing': 'SmithingApp', 'anvil': 'AnvilApp', 'stonecutter': 'StonecutterApp', 'loom': 'LoomApp', 'cartography': 'CartographyApp', 'grindstone': 'GrindstoneApp', 'furnace': 'FurnaceApp', 'brewing': 'BrewingApp'}
 
 
 def read_json(path: Path):
@@ -128,13 +128,15 @@ def check() -> tuple[dict, dict, dict]:
     return targets, lock, identity
 
 
-def prepare(name: str, lock: dict) -> Path:
+def prepare(name: str, lock: dict, offline: bool = False) -> Path:
     version = f"{lock['version']}-{name}"
     folder = ROOT / '.cache/maven/com/november/mcphone/mcphone' / version
     folder.mkdir(parents=True, exist_ok=True)
     artifact = folder / f'mcphone-{version}.jar'
     asset = lock['targets'][name]['asset']
     if not artifact.is_file() or digest(artifact) != asset['sha256']:
+        if offline:
+            raise ValueError(f'{name}: verified MCphone dependency is missing from the offline cache.')
         temporary = artifact.with_suffix('.jar.part')
         request = urllib.request.Request(asset['url'], headers={'User-Agent': 'MCphone-Modular-Workshop'})
         try:
@@ -269,10 +271,10 @@ def publish_bundle(staging: Path, selected: list[str], targets: dict, lock: dict
     return output
 
 
-def build(selected: list[str], targets: dict, lock: dict, identity: dict):
+def build(selected: list[str], targets: dict, lock: dict, identity: dict, offline: bool = False):
     jdks = {targets[name]['java']: java_home(targets[name]['java']) for name in selected}
     for name in selected:
-        prepare(name, lock)
+        prepare(name, lock, offline=offline)
     cache = ROOT / '.cache'
     cache.mkdir(exist_ok=True)
     failures = []
@@ -290,6 +292,8 @@ def build(selected: list[str], targets: dict, lock: dict, identity: dict):
             env['PATH'] = str(jdks[target['java']] / 'bin') + os.pathsep + env.get('PATH', '')
             command = (['cmd.exe', '/d', '/c', 'gradlew.bat'] if os.name == 'nt'
                        else ['sh', './gradlew']) + ['build', '--no-daemon', '--console=plain']
+            if offline:
+                command.append('--offline')
             print(f'Building {name} (Java {target["java"]}, Gradle {target["gradle"]})', flush=True)
             result = subprocess.run(command, cwd=project, env=env)
             try:
@@ -341,7 +345,10 @@ def main():
     parser.add_argument('command', choices=['check', 'matrix', 'prepare', 'build', 'bundle', 'check-upstream'])
     parser.add_argument('--target', action='append', help='Repeat to select targets; default: all.')
     parser.add_argument('--input', type=Path, help='JAR directory for bundle aggregation.')
+    parser.add_argument('--offline', action='store_true', help='Use verified cached dependencies only (build/prepare).')
     args = parser.parse_args()
+    if args.offline and args.command not in ('build', 'prepare'):
+        parser.error('--offline applies only to build or prepare.')
     targets, lock, identity = check()
     selected = args.target or list(targets)
     if len(selected) != len(set(selected)) or not set(selected) <= set(targets):
@@ -354,9 +361,9 @@ def main():
         check_upstream(targets, lock)
     elif args.command == 'prepare':
         for name in selected:
-            print(prepare(name, lock))
+            print(prepare(name, lock, offline=args.offline))
     elif args.command == 'build':
-        build(selected, targets, lock, identity)
+        build(selected, targets, lock, identity, offline=args.offline)
     elif args.command == 'bundle':
         if not args.input or args.target:
             raise ValueError('bundle requires --input and always verifies the complete target set.')

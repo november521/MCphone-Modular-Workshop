@@ -6,6 +6,12 @@ import com.november.mcphone.workshop.menu.PortableAnvilMenu;
 import com.november.mcphone.workshop.menu.PortableSmithingMenu;
 import com.november.mcphone.workshop.menu.PortableStonecutterMenu;
 import com.november.mcphone.workshop.platform.PurchaseAccess;
+import com.november.mcphone.workshop.menu.PortableLoomMenu;
+import com.november.mcphone.workshop.menu.PortableCartographyMenu;
+import com.november.mcphone.workshop.menu.PortableGrindstoneMenu;
+import com.november.mcphone.workshop.menu.PortableFurnaceMenu;
+import com.november.mcphone.workshop.menu.PortableBrewingMenu;
+import com.november.mcphone.workshop.processing.ProcessingStorage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -29,6 +35,13 @@ public final class WorkstationService {
             return;
         }
         if (isCurrentMenu(player.containerMenu, workstation)) return;
+        if (workstation == Workstation.FURNACE || workstation == Workstation.BREWING) {
+            try { ProcessingStorage.get(player); }
+            catch (IllegalStateException error) {
+                player.sendSystemMessage(Component.translatable("message.mcphone_workshop.storage_failed"));
+                return;
+            }
+        }
         player.openMenu(new SimpleMenuProvider((id, inventory, owner) -> createMenu(id, inventory, workstation),
                 Component.translatable(workstation.titleKey())));
     }
@@ -38,6 +51,11 @@ public final class WorkstationService {
             case SMITHING -> new PortableSmithingMenu(id, inventory);
             case ANVIL -> new PortableAnvilMenu(id, inventory);
             case STONECUTTER -> new PortableStonecutterMenu(id, inventory);
+            case LOOM -> new PortableLoomMenu(id, inventory);
+            case CARTOGRAPHY -> new PortableCartographyMenu(id, inventory);
+            case GRINDSTONE -> new PortableGrindstoneMenu(id, inventory);
+            case FURNACE -> new PortableFurnaceMenu(id, inventory, ProcessingStorage.get((ServerPlayer)inventory.player).furnace);
+            case BREWING -> new PortableBrewingMenu(id, inventory, ProcessingStorage.get((ServerPlayer)inventory.player).brewing);
         };
     }
     private static boolean isCurrentMenu(AbstractContainerMenu menu, Workstation workstation) {
@@ -46,6 +64,11 @@ public final class WorkstationService {
             case SMITHING -> menu instanceof PortableSmithingMenu;
             case ANVIL -> menu instanceof PortableAnvilMenu;
             case STONECUTTER -> menu instanceof PortableStonecutterMenu;
+            case LOOM -> menu instanceof PortableLoomMenu;
+            case CARTOGRAPHY -> menu instanceof PortableCartographyMenu;
+            case GRINDSTONE -> menu instanceof PortableGrindstoneMenu;
+            case FURNACE -> menu instanceof PortableFurnaceMenu;
+            case BREWING -> menu instanceof PortableBrewingMenu;
         };
     }
 }

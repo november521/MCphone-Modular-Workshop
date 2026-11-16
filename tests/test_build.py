@@ -161,6 +161,7 @@ class ArchitectureTests(unittest.TestCase):
                 (libs / build.jar_name(name, self.identity)).write_bytes(b'stale artifact')
             attempted = []
             def run(command, cwd, env):
+                self.assertIn('--offline', command)
                 attempted.append(cwd.name)
                 artifact = cwd / 'build/libs' / build.jar_name(cwd.name, self.identity)
                 self.assertFalse(artifact.exists(), 'Stale artifact was not removed')
@@ -172,9 +173,21 @@ class ArchitectureTests(unittest.TestCase):
                  patch.object(build, 'prepare'), patch.object(build, 'verify_jar'), \
                  patch.object(build.subprocess, 'run', side_effect=run), patch.object(build, 'publish_bundle') as publish:
                 with self.assertRaises(ValueError):
-                    build.build(list(self.targets), self.targets, self.lock, self.identity)
+                    build.build(list(self.targets), self.targets, self.lock, self.identity, offline=True)
                 self.assertEqual(attempted, list(self.targets))
                 publish.assert_not_called()
+
+    def test_offline_prepare_never_downloads_missing_or_corrupt_dependencies(self):
+        with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:
+            with patch.object(build, 'ROOT', Path(temporary)), patch.object(build.urllib.request, 'urlopen') as download:
+                name = '1.21.1-fabric'
+                with self.assertRaisesRegex(ValueError, 'offline cache'):
+                    build.prepare(name, self.lock, offline=True)
+                folder = Path(temporary) / '.cache/maven/com/november/mcphone/mcphone' / f"{self.lock['version']}-{name}"
+                (folder / f"mcphone-{self.lock['version']}-{name}.jar").write_bytes(b'corrupt')
+                with self.assertRaisesRegex(ValueError, 'offline cache'):
+                    build.prepare(name, self.lock, offline=True)
+                download.assert_not_called()
 
     def test_incomplete_bundle_is_rejected(self):
         with tempfile.TemporaryDirectory(dir=build.ROOT / '.cache') as temporary:

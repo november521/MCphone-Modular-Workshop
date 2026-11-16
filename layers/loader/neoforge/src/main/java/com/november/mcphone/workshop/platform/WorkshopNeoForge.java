@@ -8,6 +8,7 @@ import net.neoforged.fml.common.Mod;
 public final class WorkshopNeoForge {
     public WorkshopNeoForge(net.neoforged.bus.api.IEventBus bus) {
         ModularWorkshop.initialize();
+        ProcessingEvents.register();
         WorkshopNetwork.register(bus);
     }
 }

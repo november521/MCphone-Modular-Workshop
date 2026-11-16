@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 public final class WorkshopForge {
     public WorkshopForge() {
         ModularWorkshop.initialize();
+        ProcessingEvents.register();
         WorkshopNetwork.register();
     }
 }

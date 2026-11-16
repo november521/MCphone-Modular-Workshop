@@ -2,3 +2,8 @@ com.november.mcphone.workshop.client.CraftingApp
 com.november.mcphone.workshop.client.SmithingApp
 com.november.mcphone.workshop.client.AnvilApp
 com.november.mcphone.workshop.client.StonecutterApp
+com.november.mcphone.workshop.client.LoomApp
+com.november.mcphone.workshop.client.CartographyApp
+com.november.mcphone.workshop.client.GrindstoneApp
+com.november.mcphone.workshop.client.FurnaceApp
+com.november.mcphone.workshop.client.BrewingApp

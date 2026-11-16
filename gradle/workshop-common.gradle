@@ -87,3 +87,16 @@ tasks.register('testPortableMenus', JavaExec) {
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(target.java as int) }
 }
 tasks.named('check').configure { dependsOn(tasks.named('testPortableMenus')) }
+// Plain JVM bootstrap works for vanilla/Fabric. Forge/NeoForge need their transforming game
+// launcher before registries can initialize; compile the shared test there, but do not pretend
+// a plain JavaExec is a loader integration test.
+if (target.loader == 'Fabric') {
+tasks.register('testProcessingState', JavaExec) {
+    description = 'Check persistent processing inventory transitions and save round-trips.'
+    dependsOn(tasks.named(menuTests.classesTaskName))
+    classpath = menuTests.runtimeClasspath
+    mainClass = 'com.november.mcphone.workshop.processing.ProcessingStateTest'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(target.java as int) }
+}
+tasks.named('check').configure { dependsOn(tasks.named('testProcessingState')) }
+}

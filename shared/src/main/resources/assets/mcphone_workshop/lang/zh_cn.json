@@ -8,5 +8,16 @@
   "app.mcphone_workshop.anvil.description": "消耗一个完好的铁砧永久解锁；使用消耗原版经验与材料，铁砧不会损坏。",
   "app.mcphone_workshop.stonecutter": "切石机",
   "app.mcphone_workshop.stonecutter.description": "消耗一个切石机永久解锁，随身携带手机或平板即可打开原版界面。",
-  "message.mcphone_workshop.device_required": "请在背包或副手携带 MCphone 手机或平板。"
+  "message.mcphone_workshop.device_required": "请在背包或副手携带 MCphone 手机或平板。",
+  "app.mcphone_workshop.loom": "织布机",
+  "app.mcphone_workshop.loom.description": "消耗一个织布机永久解锁，使用原版界面加工。",
+  "app.mcphone_workshop.cartography": "制图台",
+  "app.mcphone_workshop.cartography.description": "消耗一个制图台永久解锁，使用原版界面加工。",
+  "app.mcphone_workshop.grindstone": "砂轮",
+  "app.mcphone_workshop.grindstone.description": "消耗一个砂轮永久解锁，使用原版界面加工。",
+  "app.mcphone_workshop.furnace": "熔炉",
+  "app.mcphone_workshop.furnace.description": "消耗一个对应方块永久解锁。材料独立保存，在线时关闭界面继续加工，离线暂停。",
+  "app.mcphone_workshop.brewing": "酿造台",
+  "app.mcphone_workshop.brewing.description": "消耗一个对应方块永久解锁。材料独立保存，在线时关闭界面继续加工，离线暂停。",
+  "message.mcphone_workshop.storage_failed": "无法读取工坊材料存档，已保留原文件。请联系服主检查服务器日志。"
 }

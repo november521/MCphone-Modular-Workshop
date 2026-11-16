@@ -15,6 +15,16 @@ public final class PortableMenuTest {
         if (!condition) throw new AssertionError(message);
     }
     public static void main(String[] args) {
+        check(com.november.mcphone.workshop.processing.ProcessingTimer.cooking(20, false, true) == 18,
+                "Unlit cooking must cool down by two ticks");
+        check(com.november.mcphone.workshop.processing.ProcessingTimer.cooking(20, true, false) == 0,
+                "Blocked burning furnace must reset progress");
+        check(!com.november.mcphone.workshop.processing.ProcessingTimer.accepts(64, 1, 64),
+                "Full output must not consume more input");
+        check(!com.november.mcphone.workshop.processing.ProcessingTimer.accepts(Integer.MAX_VALUE, 1, Integer.MAX_VALUE),
+                "Capacity validation must not overflow");
+        check(com.november.mcphone.workshop.processing.ProcessingTimer.accepts(63, 1, 64),
+                "Last free output slot must be usable");
         int[] callbacks = {0};
         ContainerLevelAccess delegate = new ContainerLevelAccess() {
             @Override public <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> action) {
@@ -59,7 +69,7 @@ public final class PortableMenuTest {
         check(Workstation.CRAFTING.networkId() == 0, "Existing crafting selector must remain stable");
         check(Workstation.CRAFTING.receiptId().equals("mcphone_workshop:crafting_purchase"),
                 "Upgrading must preserve existing crafting ownership");
-        for (int id : new int[] {-1, 4, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
+        for (int id : new int[] {-1, 1000, Integer.MIN_VALUE, Integer.MAX_VALUE}) {
             check(Workstation.fromNetworkId(id) == null, "Invalid station selectors must be rejected");
         }
         // Reproduce a paid App with a missing Workshop receipt, without trusting client installation.

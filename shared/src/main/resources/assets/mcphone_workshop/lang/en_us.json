@@ -8,5 +8,16 @@
   "app.mcphone_workshop.anvil.description": "Unlock with one undamaged anvil. Uses vanilla XP and materials; the portable anvil never breaks.",
   "app.mcphone_workshop.stonecutter": "Stonecutter",
   "app.mcphone_workshop.stonecutter.description": "Unlock a portable vanilla stonecutter with one block. Carry an MCphone or tablet to use.",
-  "message.mcphone_workshop.device_required": "Carry an MCphone or tablet in your inventory or offhand."
+  "message.mcphone_workshop.device_required": "Carry an MCphone or tablet in your inventory or offhand.",
+  "app.mcphone_workshop.loom": "Loom",
+  "app.mcphone_workshop.loom.description": "Unlock with one loom. Uses the vanilla menu.",
+  "app.mcphone_workshop.cartography": "Cartography Table",
+  "app.mcphone_workshop.cartography.description": "Unlock with one cartography table. Uses the vanilla menu.",
+  "app.mcphone_workshop.grindstone": "Grindstone",
+  "app.mcphone_workshop.grindstone.description": "Unlock with one grindstone. Uses the vanilla menu.",
+  "app.mcphone_workshop.furnace": "Furnace",
+  "app.mcphone_workshop.furnace.description": "Unlock permanently with one matching block. Materials persist; processing continues while online and pauses offline.",
+  "app.mcphone_workshop.brewing": "Brewing Stand",
+  "app.mcphone_workshop.brewing.description": "Unlock permanently with one matching block. Materials persist; processing continues while online and pauses offline.",
+  "message.mcphone_workshop.storage_failed": "Workshop inventory could not be loaded. The existing save was preserved. Please ask the server owner to check the log."
 }
