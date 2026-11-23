@@ -25,6 +25,13 @@ public final class PortableMenuTest {
                 "Capacity validation must not overflow");
         check(com.november.mcphone.workshop.processing.ProcessingTimer.accepts(63, 1, 64),
                 "Last free output slot must be usable");
+        // The production runtime has no proposed host API: takeover must remain disabled.
+        try {
+            Class<?> access = Class.forName("com.november.mcphone.workshop.ender.EnderChestAccess");
+            check(Boolean.FALSE.equals(access.getMethod("active").invoke(null)), "Old host must retain ownership");
+        } catch (ClassNotFoundException notACandidateTarget) {
+            // Other platforms have not entered the handoff rollout yet.
+        } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
         int[] callbacks = {0};
         ContainerLevelAccess delegate = new ContainerLevelAccess() {
             @Override public <T> Optional<T> evaluate(BiFunction<Level, BlockPos, T> action) {

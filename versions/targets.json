@@ -21,7 +21,9 @@
     "gradle": "9.7.1",
     "mappings": "official",
     "project": "platforms/1.21.1-fabric",
-    "layers": [],
+    "layers": [
+      "ender-1.21.1"
+    ],
     "buildable": true
   },
   "1.21.1-neoforge": {
@@ -34,7 +36,10 @@
     "gradle": "9.2.1",
     "mappings": "official",
     "project": "platforms/1.21.1-neoforge",
-    "layers": ["neoforge"],
+    "layers": [
+      "neoforge",
+      "ender-1.21.1"
+    ],
     "buildable": true
   },
   "26.1.2-neoforge": {
@@ -47,7 +52,9 @@
     "gradle": "9.2.1",
     "mappings": "official",
     "project": "platforms/26.1.2-neoforge",
-    "layers": ["neoforge"],
+    "layers": [
+      "neoforge"
+    ],
     "buildable": true
   }
 }

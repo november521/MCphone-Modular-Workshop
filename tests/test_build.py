@@ -62,8 +62,8 @@ class ArchitectureTests(unittest.TestCase):
                          b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             jar.writestr('LICENSE', 'MIT License')
             jar.writestr('META-INF/services/com.november.mcphone.api.client.app.IPhoneApp',
-                         ''.join(f'com.november.mcphone.workshop.client.{app}\n' for app in build.APPS.values()))
-            for app in build.APPS.values():
+                         ''.join(f'com.november.mcphone.workshop.client.{app}\n' for app in list(build.APPS.values()) + (['EnderChestApp'] if target in ('1.21.1-fabric', '1.21.1-neoforge') else [])))
+            for app in list(build.APPS.values()) + (['EnderChestApp'] if target in ('1.21.1-fabric', '1.21.1-neoforge') else []):
                 jar.writestr(f'com/november/mcphone/workshop/client/{app}.class',
                              b'\xca\xfe\xba\xbe\x00\x00' + major.to_bytes(2, 'big'))
             if loader == 'Fabric':

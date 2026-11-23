@@ -1,3 +1,8 @@
 {
-  "neoforge": { "loader": "NeoForge" }
+  "neoforge": {
+    "loader": "NeoForge"
+  },
+  "ender-1.21.1": {
+    "since": "1.21.1"
+  }
 }

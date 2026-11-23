@@ -200,6 +200,8 @@ def verify_jar(path: Path, name: str, target: dict, lock: dict, identity: dict):
                     raise ValueError(f'{path}: common class references client-only Minecraft types: {file}')
         spi = 'META-INF/services/com.november.mcphone.api.client.app.IPhoneApp'
         providers = {f'com.november.mcphone.workshop.client.{app}' for app in APPS.values()}
+        if name in ('1.21.1-fabric', '1.21.1-neoforge'):
+            providers.add('com.november.mcphone.workshop.client.EnderChestApp')
         if spi not in files or set(jar.read(spi).decode('utf-8').splitlines()) != providers:
             raise ValueError(f'{path}: missing workstation App SPI registration.')
         for provider in providers:

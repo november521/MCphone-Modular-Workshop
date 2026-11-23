@@ -100,3 +100,27 @@ tasks.register('testProcessingState', JavaExec) {
 }
 tasks.named('check').configure { dependsOn(tasks.named('testProcessingState')) }
 }
+
+// Both candidate targets discover the replacement during the host's normal pre-save-load SPI scan.
+if (workshopTargetId in ['1.21.1-fabric', '1.21.1-neoforge']) {
+    tasks.named('processResources', ProcessResources).configure {
+        filesMatching('META-INF/services/com.november.mcphone.api.client.app.IPhoneApp') {
+            filter { line -> line == 'com.november.mcphone.workshop.client.CraftingApp' ? line + '\ncom.november.mcphone.workshop.client.EnderChestApp' : line }
+        }
+    }
+}
+
+if (workshopTargetId in ['1.21.1-fabric', '1.21.1-neoforge']) {
+    def handoffTests = sourceSets.create('handoffTest') {
+        java.srcDir(new File(repositoryRoot, 'layers/version/ender-1.21.1/src/test/java'))
+        compileClasspath = files(sourceSets.main.output, providers.provider { sourceSets.main.compileClasspath })
+        runtimeClasspath = files(output, sourceSets.main.output, providers.provider { sourceSets.main.runtimeClasspath })
+    }
+    tasks.register('testHandoffContract', JavaExec) {
+        dependsOn(tasks.named(handoffTests.classesTaskName))
+        classpath = handoffTests.runtimeClasspath
+        mainClass = 'com.november.mcphone.workshop.ender.HandoffContractTest'
+        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    }
+    tasks.named('check').configure { dependsOn(tasks.named('testHandoffContract')) }
+}
