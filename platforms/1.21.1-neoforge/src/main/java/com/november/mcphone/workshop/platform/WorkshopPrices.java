@@ -15,6 +15,9 @@ public final class WorkshopPrices implements IAppPriceProvider {
         for (Workstation workstation : Workstation.values()) {
             prices.put(ResourceLocation.parse(workstation.appId()), new WorkstationPurchaseCost(workstation));
         }
+        if (com.november.mcphone.workshop.ender.EnderChestAccess.active()) {
+            prices.put(com.november.mcphone.workshop.ender.EnderChestAccess.ID, new com.november.mcphone.workshop.ender.EnderChestCost());
+        }
         return prices;
     }
 }
